@@ -57,6 +57,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 <xsl:variable name="synccall_width" select="7"/>
 <xsl:variable name="synccall_height" select="10"/>
 <xsl:variable name="space_per_synccall" select="15"/>
+<xsl:variable name="additional_line_height" select="5"/>
 
 <xsl:variable name="selfcall_width" select="10"/>
 <xsl:variable name="selfcall_height" select="10"/>
@@ -72,16 +73,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<xsl:variable name="delta">
 		<xsl:choose>
 			<xsl:when test="@dst and @sync and (@dst != @src)">
-				<xsl:value-of select="$space_per_synccall"/>
+				<xsl:value-of select="$space_per_synccall + count(text-line) * $additional_line_height"/>
 			</xsl:when>
 			<xsl:when test="@dst and not(@sync) and (@dst != @src)">
-				<xsl:value-of select="$space_per_call"/>
+				<xsl:value-of select="$space_per_call + count(text-line) * $additional_line_height"/>
 			</xsl:when>
 			<xsl:when test="(not(@dst) or (@dst = @src)) and @sync">
-				<xsl:value-of select="$space_per_selfsynccall"/>
+				<xsl:value-of select="$space_per_selfsynccall + count(text-line) * $additional_line_height"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="$space_per_selfcall"/>
+				<xsl:value-of select="$space_per_selfcall + count(text-line) * $additional_line_height"/>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
@@ -153,11 +154,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	<xsl:if test="not($next_call)">
 		<!-- at the end -->
 		
+		<!-- display drawing properties (user can configure proper dimensions according that) -->
+		<xsl:message>required height: <xsl:value-of select="$act_y"/></xsl:message>
+		<xsl:message>configured height: <xsl:value-of select="//flow/@height"/></xsl:message>
+
 		<!-- warning if height/width cuts the image -->
 		<xsl:if test="//flow/@height &lt; $act_y">
 			<xsl:message>WARNING: The image height is too small to fit the diagram!</xsl:message>
-			<xsl:message>requested: <xsl:value-of select="$act_y"/></xsl:message>
-			<xsl:message>height: <xsl:value-of select="//flow/@height"/></xsl:message>
 		</xsl:if>
 	
 		<xsl:for-each select="//objects/object">
@@ -219,10 +222,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 	</defs>
 	<xsl:text>&#xA;</xsl:text>
 
-<!--
+
 	<rect x="0" y="0" width="{@width}" height="{@height}"
 		fill="white" stroke="none" />
--->
+
 
 <!--	<xsl:for-each select="objects/object">
 		<xsl:call-template name="objtmp"/>
@@ -290,6 +293,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<xsl:value-of select="@desc"/>
 	</text>
 	<xsl:text>&#x0A;</xsl:text>
+
+	<!-- display additional text lines (under the arrow) -->
+	<xsl:for-each select="text-line">
+		<text stroke="none" x="{$textx + $call_text_dx}" y="{$yy + position() * $additional_line_height}"
+			dy="{$text_dy}"
+			letter-spacing="0" word-spacing="0" kerning="0"
+			font-family="{$font_family}"
+			font-size="{$call_font_size}">
+				<xsl:value-of select="."/>
+		</text>
+	</xsl:for-each>
+
 </xsl:template>
 
 <!-- selfcalls -->
@@ -320,6 +335,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<xsl:value-of select="@desc"/>
 	</text>
 	<xsl:text>&#x09;</xsl:text>
+	
+	<!-- display additional text lines (under the arrow) -->
+	<xsl:for-each select="text-line">
+		<text stroke="none" x="{$textx + $call_text_dx}" y="{$yy + $selfcall_height + position() * $additional_line_height}"
+			dy="{$text_dy}"
+			letter-spacing="0" word-spacing="0" kerning="0"
+			font-family="{$font_family}"
+			font-size="{$call_font_size}">
+				<xsl:value-of select="."/>
+		</text>
+	</xsl:for-each>
 </xsl:template>
 
 <!-- self sync calls -->
@@ -355,6 +381,18 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<xsl:value-of select="@desc"/>
 	</text>
 	<xsl:text>&#x09;</xsl:text>
+	
+	<!-- display additional text lines (under the arrow) -->
+	<xsl:for-each select="text-line">
+		<!--<text stroke="none" x="{$textx + $call_text_dx}" y="{$yy + $synccall_height + position() * $additional_line_height - $call_text_dy}"-->
+		<text stroke="none" x="{$textx + $call_text_dx}" y="{$yy + $synccall_height - 2 * $synccall_dy + position() * $additional_line_height}"
+			dy="{$text_dy}"
+			letter-spacing="0" word-spacing="0" kerning="0"
+			font-family="{$font_family}"
+			font-size="{$call_font_size}">
+				<xsl:value-of select="."/>
+		</text>
+	</xsl:for-each>
 </xsl:template>
 
 <!-- synccalls -->
@@ -403,6 +441,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<xsl:value-of select="@desc"/>
 	</text>
 	<xsl:text>&#x0A;</xsl:text>
+	
+	<!-- display additional text lines (under the arrow) -->
+	<xsl:for-each select="text-line">
+		<text stroke="none" x="{$textx + $call_text_dx}" y="{$yy + $synccall_height - 2 * $synccall_dy + position() * $additional_line_height}"
+			dy="{$text_dy}"
+			letter-spacing="0" word-spacing="0" kerning="0"
+			font-family="{$font_family}"
+			font-size="{$call_font_size}">
+				<xsl:value-of select="."/>
+		</text>
+	</xsl:for-each>
 </xsl:template>
 
 
