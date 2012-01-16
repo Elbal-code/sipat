@@ -15,6 +15,7 @@
 	<call src="ps" dst="xcap" desc="GET (authorization doc)" sync="true"/>
 	<call src="ps" desc="STORE message"/>
 	<call src="ps" desc="STORE message(sync)" sync="true"/>
+	<call src="ps" dst="a" desc="Small talk" color="grey" arrow="both" line-type="2,2"/>
 	<call src="ps" dst="a" desc="NOTIFY" color="red"/>
 	<call src="a" dst="ps" desc="200 OK" color="red"/>
 	

@@ -184,6 +184,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 			<line x1="15" y1="5" x2="0" y2="10"/>
 		</g>
 	</marker>
+	
+	<marker id="arrow-start-{$color}"
+		viewBox="0 0 15 10" refX="0" refY="5" 
+		markerUnits="userSpaceOnUse"
+		markerWidth="4" markerHeight="3"
+		orient="auto">
+		<g stroke="{$color}" stroke-width="{$arrow_line_width}"> 
+			<line x1="0" y1="5" x2="15" y2="0"/>
+			<line x1="0" y1="5" x2="15" y2="10"/>
+		</g>
+	</marker>
 	<xsl:text>&#xA;</xsl:text>
 </xsl:template>
 
@@ -279,9 +290,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 		</xsl:choose>
 	</xsl:variable>
 	<xsl:text>&#x09;</xsl:text>
-	<line x1="{$xx}" y1="{$yy}" x2="{$xx1}" y2="{$yy}"
-		marker-end="url(#arrow-{$color})" 
-		stroke="{$color}" stroke-width="{$call_line_width}" stroke-dasharray="{$line-type}"/>
+	<xsl:choose>
+		<xsl:when test="@arrow = 'both'">
+			<line x1="{$xx}" y1="{$yy}" x2="{$xx1}" y2="{$yy}"
+			marker-start="url(#arrow-start-{$color})" 
+			marker-end="url(#arrow-{$color})" 
+			stroke="{$color}" stroke-width="{$call_line_width}" stroke-dasharray="{$line-type}"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<line x1="{$xx}" y1="{$yy}" x2="{$xx1}" y2="{$yy}"
+			marker-end="url(#arrow-{$color})" 
+			stroke="{$color}" stroke-width="{$call_line_width}" stroke-dasharray="{$line-type}"/>
+		</xsl:otherwise>
+	</xsl:choose>
 	<xsl:text>&#x0A;&#x09;</xsl:text>
 	<text stroke="none" x="{$textx + $call_text_dx}" y="{$yy - $call_text_dy}" 
 		dy="{$text_dy}"
